@@ -12,7 +12,7 @@ function drawEye(side) {
   translate(width / 2, height / 2);
 
   // calculate dimensions for each eye
-	//
+  //
   //       ┌─────────────────────────── eyelidPeak
   //       │
   //       ▼          ├──────────┤◄──── palpebralFissureX
@@ -23,14 +23,18 @@ function drawEye(side) {
   //               └─────────────────── innerCanthalDistance
 
   const innerCanthalDistance = width / 10;
-  const palpebralFissureY = width / 6;
-  const palpebralFissureX = width * 0.37;
-  const eyelidPeak = palpebralFissureX * 0.48;
+  const centerOffset = innerCanthalDistance / 2;
 
-	// calculate positions for each eye
-	//
-	// ┌───────── outer ──────────┐
-	// │     ┌─── top ──────┐     │
+  const palpebralFissureX = width * 0.37;
+  const palpebralFissureY = width / 6;
+  const yOffset = palpebralFissureY / 2;
+  
+	const eyelidPeak = palpebralFissureX * 0.48 + centerOffset;
+
+  // calculate positions for each eye
+  //
+  // ┌───────── outer ──────────┐
+  // │     ┌─── top ──────┐     │
   // │     ▼              ▼     │
   // ▼⣀⣤⣤⡖⠛⣭⡉⠓⣦⡀⠀⠀⠀⠀⠀⠀⠀⣠⢴⠒⠒⠒⠦⢄⡀⠀▼
   // ⠙⣇⠀⠀⣷⡀⠛⠃⢀⡇⠙⢦⠀⠀⠀⢀⡿⠟⠉⢿⠀⠿⠃⢀⡇⠈⣱⣦
@@ -40,10 +44,31 @@ function drawEye(side) {
   //       │    inner     │
   //       └─── bottom ───┘
 
+  // note: sides are based off of the EYES' POV
+  //   RIGHT              LEFT
+
+  const leftEye = {
+    inner: {
+      x: centerOffset,
+      y: 0,
+    },
+    top: {
+      x: eyelidPeak,
+      y: yOffset,
+    },
+    outer: {
+      x: centerOffset + palpebralFissureX,
+      y: 0,
+    },
+		bottom: {
+			x: eyelidPeak,
+			y: -1 * yOffset,
+		}
+  };
   beginShape();
-  splineVertex(innerCanthalDistance / 2, 0);
-  splineVertex(eyelidPeak, palpebralFissureY / 2);
-  splineVertex(palpebralFissureX, 0);
-  splineVertex(eyelidPeak, (-1 * palpebralFissureY) / 2);
+  splineVertex(leftEye.inner.x, leftEye.inner.y);
+  splineVertex(leftEye.top.x, leftEye.top.y);
+  splineVertex(leftEye.outer.x, leftEye.outer.y);
+  splineVertex(leftEye.bottom.x, leftEye.bottom.y);
   endShape(CLOSE);
 }
