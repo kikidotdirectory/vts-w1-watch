@@ -21,16 +21,26 @@ class Eye {
     // ⠀⠀⠀⠈⠓⠦⠤⠖⠚⠁⠀⠀⠀⠀│⠀⠀⠀⠀⠙⠷⣦⣤⣶⠞⠉⠀⠀⠀┴
     //               └─────────────────── innerCanthalDistance
 
-    const innerCanthalDistance = width / 10;
+    // distance between eyes
+    const innerCanthalDistance = width / 16;
     const centerOffset = innerCanthalDistance / 2;
 
-    const palpebralFissureX = width * 0.37;
-    const palpebralFissureY = width / 6;
-    const yOffset = palpebralFissureY / 2.2;
+    // eye size
+    const eyeWidth = width * 0.37;
+    const eyeHeightMax = eyeWidth * 0.486;
+    const eyeHeightMin = eyeWidth * 0.183;
+    const yOffset = eyeHeightMax / 2;
 
-    const eyelidPeak = palpebralFissureX * 0.48 + centerOffset;
+    const eyelidPeak = eyeWidth * 0.48 + centerOffset;
     const eyeBaseline = 0; // centered
+    const outerOffset = 1.03;
 
+    this.inner = {
+      x: side * centerOffset,
+      y: eyeBaseline,
+      a1: { min: -19, max: -51 },
+      a2: { min: 11, max: 19 },
+    };
     this.q1 = {
       //       ┌─────┐  ┌─────┐
       //  ⣀⣤⣤⡖⠛│⡉⠓⣦⡀⠀│⠀⠀│⠀⠀⣠⢴⠒│⠒⠦⢄⡀⠀
@@ -39,10 +49,13 @@ class Eye {
       // ⠀⠀⠀⠈⠓⠦⠤⠖⠚⠁⠀     ⠀⠀⠙⠷⣦⣤⣶⠞⠉⠀⠀⠀
       //
 
-      a1: { x: side * centerOffset, y: eyeBaseline },
+      a1: { x: this.inner.x, y: this.inner.y },
       a2: { x: side * eyelidPeak, y: -yOffset },
-      c1: { x: side * centerOffset, y: -yOffset },
-      c2: { x: side * (eyelidPeak - palpebralFissureX * 0.3), y: -yOffset },
+      c1: {
+        x: this.inner.x,
+        y: interpolateThing(this.inner.a1.min, this.inner.a1.max),
+      },
+      c2: { x: side * (eyelidPeak - eyeWidth * 0.3), y: -yOffset },
     };
 
     this.q2 = {
@@ -54,9 +67,9 @@ class Eye {
       //
 
       a1: { x: side * eyelidPeak, y: -yOffset },
-      a2: { x: side * palpebralFissureX, y: eyeBaseline },
-      c1: { x: side * (eyelidPeak + palpebralFissureX * 0.2), y: -yOffset },
-      c2: { x: side * palpebralFissureX, y: palpebralFissureY * -0.25 },
+      a2: { x: side * eyeWidth, y: eyeBaseline },
+      c1: { x: side * (eyelidPeak + eyeWidth * 0.2), y: -yOffset },
+      c2: { x: side * eyeWidth, y: eyeHeightMax * -0.25 },
     };
 
     this.q3 = {
@@ -67,10 +80,10 @@ class Eye {
       //│⠀⠀⠀⠈⠓⠦│⠖⠚⠁⠀     ⠀⠀⠙⠷⣦⣤│⠞⠉⠀⠀⠀ │
       //└──────┘               └──────┘
 
-      a1: { x: side * (centerOffset + palpebralFissureX), y: eyeBaseline },
+      a1: { x: side * (centerOffset + eyeWidth), y: eyeBaseline },
       a2: { x: side * eyelidPeak, y: yOffset },
-      c1: { x: side * palpebralFissureX, y: yOffset * 0.67 },
-      c2: { x: side * (eyelidPeak + palpebralFissureX * 0.2), y: yOffset },
+      c1: { x: side * eyeWidth, y: yOffset * 0.67 },
+      c2: { x: side * (eyelidPeak + eyeWidth * 0.2), y: yOffset },
     };
 
     this.q4 = {
@@ -83,7 +96,7 @@ class Eye {
 
       a1: { x: side * eyelidPeak, y: yOffset },
       a2: { x: side * centerOffset, y: eyeBaseline },
-      c1: { x: side * (eyelidPeak - palpebralFissureX * 0.27), y: yOffset },
+      c1: { x: side * (eyelidPeak - eyeWidth * 0.27), y: yOffset },
       c2: { x: side * centerOffset, y: yOffset * 0.55 },
     };
   }
@@ -120,4 +133,11 @@ function setup() {
   let rightEye = new Eye("right");
   leftEye.see();
   rightEye.see();
+}
+
+const now = new Date();
+const secondsSinceHourStart = now.getMinutes() * 60 + now.getSeconds();
+function interpolateThing(min, max) {
+  // return a lower number the closer it is to the end of the hour (closer to min)
+  return map(3600 - secondsSinceHourStart, 0, 3600, min, max);
 }
