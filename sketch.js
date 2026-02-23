@@ -21,25 +21,40 @@ class Eye {
     // ⠀⠀⠀⠈⠓⠦⠤⠖⠚⠁⠀⠀⠀⠀│⠀⠀⠀⠀⠙⠷⣦⣤⣶⠞⠉⠀⠀⠀┴
     //               └─────────────────── innerCanthalDistance
 
-    // distance between eyes
-    const innerCanthalDistance = width / 16;
-    const centerOffset = innerCanthalDistance / 2;
-
+    // Generate dimensions of eye based off of canvas size.
     // eye size
     const eyeWidth = width * 0.37;
     const eyeHeightMax = eyeWidth * 0.486;
     const eyeHeightMin = eyeWidth * 0.183;
     const yOffset = eyeHeightMax / 2;
 
-    const eyelidPeak = eyeWidth * 0.48 + centerOffset;
+    // horizontal positioning
+    const innerCanthalDistance = width / 16;
+    const centerOffset = side * (innerCanthalDistance / 2);
+    const eyelidPeakX = side * (eyeWidth * 0.48 + centerOffset);
+
+    // vertical positioning
     const eyeBaseline = 0; // centered
-    const outerOffset = 1.03;
+    // outer corner is higher than inner
+    const outerOffsetY = -eyeHeightMax * 0.05;
+
+    // eye opening displacement, relative to baseline
+    const upperEyelidMax = -eyeHeightMax * 0.59;
+    const upperEyelidMin = -eyeHeightMax * 0.17;
+    const lowerEyelidMax = eyeHeightMax * 0.42;
+    const lowerEyelidMin = eyeHeightMax * 0.23;
 
     this.inner = {
       x: side * centerOffset,
       y: eyeBaseline,
-      a1: { min: -19, max: -51 },
-      a2: { min: 11, max: 19 },
+      a1: { min: -(eyeHeightMax * 0.19), max: -(eyeHeightMax * 0.51) },
+      a2: { min: eyeHeightMax * 0.11, max: eyeHeightMax * 0.29 },
+    };
+    this.upper = {
+      x: side * eyelidPeakX,
+      y: { min: eyeHeightMax * 0.17, max: eyeHeightMax * 0.61 },
+      a1: side * (eyeWidth * 0.28),
+      a2: this.upper.a1,
     };
     this.q1 = {
       //       ┌─────┐  ┌─────┐
