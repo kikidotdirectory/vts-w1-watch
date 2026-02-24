@@ -70,33 +70,33 @@ class Eye {
       centerOffset - cx,
       eyeBaseline,
       centerOffset - cx,
-      lerpByHour(innerUpperMin, innerUpperMax),
+      lerpInHour(innerUpperMin, innerUpperMax),
       centerOffset - cx,
-      lerpByHour(innerLowerMin, innerLowerMax),
+      lerpInHour(innerLowerMin, innerLowerMax),
     );
     this.upper = makePoint(
       0,
-      lerpByHour(upperEyelidMin, upperEyelidMax),
+      lerpInHour(upperEyelidMin, upperEyelidMax),
       eyelidInnerAnchor - cx,
-      lerpByHour(upperEyelidMin, upperEyelidMax),
+      lerpInHour(upperEyelidMin, upperEyelidMax),
       eyelidOuterAnchor - cx,
-      lerpByHour(upperEyelidMin, upperEyelidMax),
+      lerpInHour(upperEyelidMin, upperEyelidMax),
     );
     this.lower = makePoint(
       0,
-      lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      lerpInHour(lowerEyelidMin, lowerEyelidMax),
       eyelidInnerAnchor - cx,
-      lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      lerpInHour(lowerEyelidMin, lowerEyelidMax),
       eyelidOuterAnchor - cx,
-      lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      lerpInHour(lowerEyelidMin, lowerEyelidMax),
     );
     this.outer = makePoint(
       outerCornerX - cx,
       outerCornerY,
       outerCornerX - cx,
-      lerpByHour(outerUpperMin, outerUpperMax),
+      lerpInHour(outerUpperMin, outerUpperMax),
       outerCornerX - cx,
-      lerpByHour(outerLowerMin, outerLowerMax),
+      lerpInHour(outerLowerMin, outerLowerMax),
     );
 
     // create segments to draw with bezierVertex
@@ -164,7 +164,7 @@ function setup() {
 }
 
 // helper functions
-function lerpByHour(min, max) {
+function lerpInHour(min, max) {
   const now = new Date();
   const secondsSinceHourStart = now.getMinutes() * 60 + now.getSeconds();
   // return a lower number the closer it is to the end of the hour (closer to min)
