@@ -62,114 +62,31 @@ class Eye {
     const eyelidOuterAnchor = side * (abs(eyelidPeakX) + eyelidAnchorOffset);
 
     // define positions of points and their anchors
-    this.inner = {
-      x: centerOffset,
-      y: eyeBaseline,
-      c1: {
-        x: centerOffset,
-        y: lerpByHour(innerUpperMin, innerUpperMax),
-      },
-      c2: {
-        x: centerOffset,
-        y: lerpByHour(innerLowerMin, innerLowerMax),
-      },
-    };
-    this.upper = {
-      x: eyelidPeakX,
-      y: lerpByHour(upperEyelidMin, upperEyelidMax),
-      c1: {
-        x: eyelidInnerAnchor,
-        y: lerpByHour(upperEyelidMin, upperEyelidMax),
-      },
-      c2: {
-        x: eyelidOuterAnchor,
-        y: lerpByHour(upperEyelidMin, upperEyelidMax),
-      },
-    };
-    this.lower = {
-      x: eyelidPeakX,
-      y: lerpByHour(lowerEyelidMin, lowerEyelidMax),
-      c1: {
-        x: eyelidInnerAnchor,
-        y: lerpByHour(lowerEyelidMin, lowerEyelidMax),
-      },
-      c2: {
-        x: eyelidOuterAnchor,
-        y: lerpByHour(lowerEyelidMin, lowerEyelidMax),
-      },
-    };
-    this.outer = {
-      x: outerCornerX,
-      y: outerCornerY,
-      c1: {
-        x: outerCornerX,
-        y: lerpByHour(outerUpperMin, outerUpperMax),
-      },
-      c2: {
-        x: outerCornerX,
-        y: lerpByHour(outerLowerMin, outerLowerMax),
-      },
-    };
-    this.q1 = {
-      //       ┌─────┐  ┌─────┐
-      //  ⣀⣤⣤⡖⠛│⡉⠓⣦⡀⠀│⠀⠀│⠀⠀⣠⢴⠒│⠒⠦⢄⡀⠀
-      // ⠙⣇⠀⠀⣷⡀└─────┘⠀⠀└─────┘⠃⢀⡇⠈⣱⣦
-      // ⠀⠈⠳⣄⠀⠙⠓⠋⠉⣀⡔⠋⠀⠀⠀⠀⠻⣦⡀⠘⠷⠦⠶⠋⢀⡴⠋⠀
-      // ⠀⠀⠀⠈⠓⠦⠤⠖⠚⠁⠀     ⠀⠀⠙⠷⣦⣤⣶⠞⠉⠀⠀⠀
-      //
+    this.inner = makePoint(
+      centerOffset, eyeBaseline,
+      centerOffset, lerpByHour(innerUpperMin, innerUpperMax),
+      centerOffset, lerpByHour(innerLowerMin, innerLowerMax)
+    );
+    this.upper = makePoint(
+      eyelidPeakX, lerpByHour(upperEyelidMin, upperEyelidMax),
+      eyelidInnerAnchor, lerpByHour(upperEyelidMin, upperEyelidMax),
+      eyelidOuterAnchor, lerpByHour(upperEyelidMin, upperEyelidMax)
+    );
+    this.lower = makePoint(
+      eyelidPeakX, lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      eyelidInnerAnchor, lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      eyelidOuterAnchor, lerpByHour(lowerEyelidMin, lowerEyelidMax)
+    );
+    this.outer = makePoint(
+      outerCornerX, outerCornerY,
+      outerCornerX, lerpByHour(outerUpperMin, outerUpperMax),
+      outerCornerX, lerpByHour(outerLowerMin, outerLowerMax)
+    );
 
-      a1: { x: this.inner.x, y: this.inner.y },
-      a2: { x: this.upper.x, y: this.upper.y },
-      c1: {
-        x: this.inner.c1.x,
-        y: this.inner.c1.y,
-      },
-      c2: {
-        x: this.upper.c1.x,
-        y: this.upper.c1.y,
-      },
-    };
-
-    this.q2 = {
-      //┌──────┐              ┌──────┐
-      //│ ⣀⣤⣤⡖⠛│⡉⠓⣦⡀⠀⠀⠀⠀⠀⠀⠀⣠⢴⠒│⠒⠦⢄⡀⠀ │
-      //└──────┘⠃⢀⡇⠙⢦⠀⠀⠀⢀⡿⠟⠉⢿⠀└──────┘
-      // ⠀⠈⠳⣄⠀⠙⠓⠋⠉⣀⡔⠋⠀⠀⠀⠀⠻⣦⡀⠘⠷⠦⠶⠋⢀⡴⠋⠀
-      // ⠀⠀⠀⠈⠓⠦⠤⠖⠚⠁⠀     ⠀⠀⠙⠷⣦⣤⣶⠞⠉⠀⠀⠀
-      //
-
-      a1: { x: this.upper.x, y: this.upper.y },
-      a2: { x: this.outer.x, y: this.outer.y },
-      c1: { x: this.upper.c2.x, y: this.upper.c2.y },
-      c2: { x: this.outer.c1.x, y: this.outer.c1.y },
-    };
-
-    this.q3 = {
-      //
-      //  ⣀⣤⣤⡖⠛⣭⡉⠓⣦⡀⠀⠀⠀⠀⠀⠀⠀⣠⢴⠒⠒⠒⠦⢄⡀⠀
-      //┌──────┐⠃⢀⡇⠙⢦⠀⠀⠀⢀⡿⠟⠉⢿⠀⠿┌──────┐
-      //│⠀⠈⠳⣄⠀⠙│⠋⠉⣀⡔⠋⠀⠀⠀⠀⠻⣦⡀⠘⠷⠦│⠋⢀⡴⠋⠀ │
-      //│⠀⠀⠀⠈⠓⠦│⠖⠚⠁⠀     ⠀⠀⠙⠷⣦⣤│⠞⠉⠀⠀⠀ │
-      //└──────┘               └──────┘
-
-      a1: { x: this.outer.x, y: this.outer.y },
-      a2: { x: this.lower.x, y: this.lower.y },
-      c1: { x: this.outer.c2.x, y: this.outer.c2.y },
-      c2: { x: this.lower.c2.x, y: this.lower.c2.y },
-    };
-
-    this.q4 = {
-      //
-      //  ⣀⣤⣤⡖⠛⣭⡉⠓⣦⡀⠀⠀⠀⠀⠀⠀⠀⣠⢴⠒⠒⠒⠦⢄⡀⠀
-      // ⠙⣇⠀⠀⣷⡀⠛┌────┐⠀┌─────┐⠿⠃⢀⡇⠈⣱⣦
-      // ⠀⠈⠳⣄⠀⠙⠓│⠉⣀⡔⠋│⠀│⠀⠻⣦⡀⠘│⠦⠶⠋⢀⡴⠋⠀
-      // ⠀⠀⠀⠈⠓⠦⠤│⠚⠁⠀ │ │ ⠀⠀⠙⠷│⣤⣶⠞⠉⠀⠀⠀
-      //        └────┘ └─────┘
-
-      a2: { x: this.inner.x, y: this.inner.y },
-      c1: { x: this.lower.c1.x, y: this.lower.c1.y },
-      c2: { x: this.inner.c2.x, y: this.inner.c2.y },
-    };
+    this.q1 = makeSegment(this.inner.c1, this.upper.c1, this.upper)
+    this.q2 = makeSegment(this.upper.c2, this.outer.c1, this.outer)
+    this.q3 = makeSegment(this.outer.c2, this.lower.c2, this.lower)
+    this.q4 = makeSegment(this.lower.c1, this.inner.c2, this.inner)
   }
 
   see() {
@@ -186,7 +103,7 @@ class Eye {
     // 2. Control 1
     // 3. Control 2
     // 4. Anchor 2
-    bezierVertex(this.q1.a1.x, this.q1.a1.y);
+    bezierVertex(this.inner.x, this.inner.y);
     for (let q of [this.q1, this.q2, this.q3, this.q4]) {
       bezierVertex(q.c1.x, q.c1.y);
       bezierVertex(q.c2.x, q.c2.y);
