@@ -67,35 +67,35 @@ class Eye {
       y: eyeBaseline,
       c1: {
         x: centerOffset,
-        y: interpolateThing(innerUpperMin, innerUpperMax),
+        y: lerpByHour(innerUpperMin, innerUpperMax),
       },
       c2: {
         x: centerOffset,
-        y: interpolateThing(innerLowerMin, innerLowerMax),
+        y: lerpByHour(innerLowerMin, innerLowerMax),
       },
     };
     this.upper = {
       x: eyelidPeakX,
-      y: interpolateThing(upperEyelidMin, upperEyelidMax),
+      y: lerpByHour(upperEyelidMin, upperEyelidMax),
       c1: {
         x: eyelidInnerAnchor,
-        y: interpolateThing(upperEyelidMin, upperEyelidMax),
+        y: lerpByHour(upperEyelidMin, upperEyelidMax),
       },
       c2: {
         x: eyelidOuterAnchor,
-        y: interpolateThing(upperEyelidMin, upperEyelidMax),
+        y: lerpByHour(upperEyelidMin, upperEyelidMax),
       },
     };
     this.lower = {
       x: eyelidPeakX,
-      y: interpolateThing(lowerEyelidMin, lowerEyelidMax),
+      y: lerpByHour(lowerEyelidMin, lowerEyelidMax),
       c1: {
         x: eyelidInnerAnchor,
-        y: interpolateThing(lowerEyelidMin, lowerEyelidMax),
+        y: lerpByHour(lowerEyelidMin, lowerEyelidMax),
       },
       c2: {
         x: eyelidOuterAnchor,
-        y: interpolateThing(lowerEyelidMin, lowerEyelidMax),
+        y: lerpByHour(lowerEyelidMin, lowerEyelidMax),
       },
     };
     this.outer = {
@@ -103,11 +103,11 @@ class Eye {
       y: outerCornerY,
       c1: {
         x: outerCornerX,
-        y: interpolateThing(outerUpperMin, outerUpperMax),
+        y: lerpByHour(outerUpperMin, outerUpperMax),
       },
       c2: {
         x: outerCornerX,
-        y: interpolateThing(outerLowerMin, outerLowerMax),
+        y: lerpByHour(outerLowerMin, outerLowerMax),
       },
     };
     this.q1 = {
@@ -207,9 +207,9 @@ function setup() {
   console.log(leftEye.upper.a1);
 }
 
-const now = new Date();
-const secondsSinceHourStart = now.getMinutes() * 60 + now.getSeconds();
-function interpolateThing(min, max) {
+function lerpByHour(min, max) {
+  const now = new Date();
+  const secondsSinceHourStart = now.getMinutes() * 60 + now.getSeconds();
   // return a lower number the closer it is to the end of the hour (closer to min)
   return map(3600 - secondsSinceHourStart, 0, 3600, min, max);
 }
