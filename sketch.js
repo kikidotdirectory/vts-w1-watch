@@ -61,38 +61,78 @@ class Eye {
     const eyelidInnerAnchor = side * (abs(eyelidPeakX) - eyelidAnchorOffset);
     const eyelidOuterAnchor = side * (abs(eyelidPeakX) + eyelidAnchorOffset);
 
-    // define positions of points and their anchors
+    // eye center for translation in see()
+    this.cx = eyelidPeakX;
+
+    // define positions of points and their anchors, relative to eyelidPeakX
+    const cx = eyelidPeakX;
     this.inner = makePoint(
-      centerOffset, eyeBaseline,
-      centerOffset, lerpByHour(innerUpperMin, innerUpperMax),
-      centerOffset, lerpByHour(innerLowerMin, innerLowerMax)
+      centerOffset - cx,
+      eyeBaseline,
+      centerOffset - cx,
+      lerpByHour(innerUpperMin, innerUpperMax),
+      centerOffset - cx,
+      lerpByHour(innerLowerMin, innerLowerMax),
     );
     this.upper = makePoint(
-      eyelidPeakX, lerpByHour(upperEyelidMin, upperEyelidMax),
-      eyelidInnerAnchor, lerpByHour(upperEyelidMin, upperEyelidMax),
-      eyelidOuterAnchor, lerpByHour(upperEyelidMin, upperEyelidMax)
+      0,
+      lerpByHour(upperEyelidMin, upperEyelidMax),
+      eyelidInnerAnchor - cx,
+      lerpByHour(upperEyelidMin, upperEyelidMax),
+      eyelidOuterAnchor - cx,
+      lerpByHour(upperEyelidMin, upperEyelidMax),
     );
     this.lower = makePoint(
-      eyelidPeakX, lerpByHour(lowerEyelidMin, lowerEyelidMax),
-      eyelidInnerAnchor, lerpByHour(lowerEyelidMin, lowerEyelidMax),
-      eyelidOuterAnchor, lerpByHour(lowerEyelidMin, lowerEyelidMax)
+      0,
+      lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      eyelidInnerAnchor - cx,
+      lerpByHour(lowerEyelidMin, lowerEyelidMax),
+      eyelidOuterAnchor - cx,
+      lerpByHour(lowerEyelidMin, lowerEyelidMax),
     );
     this.outer = makePoint(
-      outerCornerX, outerCornerY,
-      outerCornerX, lerpByHour(outerUpperMin, outerUpperMax),
-      outerCornerX, lerpByHour(outerLowerMin, outerLowerMax)
+      outerCornerX - cx,
+      outerCornerY,
+      outerCornerX - cx,
+      lerpByHour(outerUpperMin, outerUpperMax),
+      outerCornerX - cx,
+      lerpByHour(outerLowerMin, outerLowerMax),
     );
 
-    this.q1 = makeSegment(this.inner.c1, this.upper.c1, this.upper)
-    this.q2 = makeSegment(this.upper.c2, this.outer.c1, this.outer)
-    this.q3 = makeSegment(this.outer.c2, this.lower.c2, this.lower)
-    this.q4 = makeSegment(this.lower.c1, this.inner.c2, this.inner)
+    // create segments to draw with bezierVertex
+    this.q1 = makeSegment(this.inner.c1, this.upper.c1, this.upper);
+    this.q2 = makeSegment(this.upper.c2, this.outer.c1, this.outer);
+    this.q3 = makeSegment(this.outer.c2, this.lower.c2, this.lower);
+    this.q4 = makeSegment(this.lower.c1, this.inner.c2, this.inner);
   }
 
   see() {
     push();
     noFill();
-    translate(width / 2, height / 2);
+    translate(width / 2 + this.cx, height / 2);
+    beginShape();
+    strokeWeight(3);
+    // BezierVertex needs to be called four times
+    // for more: https://beta.p5js.org/reference/p5/beziervertex/ (v2)
+
+    // for each:
+    // 1. Anchor 1
+    // 2. Control 1
+    // 3. Control 2
+    // 4. Anchor 2
+    bezierVertex(this.inner.x, this.inner.y);
+    for (let q of [this.q1, this.q2, this.q3, this.q4]) {
+      bezierVertex(q.c1.x, q.c1.y);
+      bezierVertex(q.c2.x, q.c2.y);
+      bezierVertex(q.a2.x, q.a2.y);
+    }
+    endShape();
+    pop();
+
+    push();
+    translate(width / 2 + this.cx, height / 2);
+    scale(0.5);
+    noFill();
     beginShape();
     strokeWeight(3);
     // BezierVertex needs to be called four times
