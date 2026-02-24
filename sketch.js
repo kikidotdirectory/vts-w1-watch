@@ -100,10 +100,10 @@ class Eye {
     );
 
     // create segments to draw with bezierVertex
-    this.q1 = makeSegment(this.inner.c1, this.upper.c1, this.upper);
-    this.q2 = makeSegment(this.upper.c2, this.outer.c1, this.outer);
-    this.q3 = makeSegment(this.outer.c2, this.lower.c2, this.lower);
-    this.q4 = makeSegment(this.lower.c1, this.inner.c2, this.inner);
+    this.q1 = makeSegment(this.inner, this.inner.c1, this.upper.c1, this.upper);
+    this.q2 = makeSegment(this.upper, this.upper.c2, this.outer.c1, this.outer);
+    this.q3 = makeSegment(this.outer, this.outer.c2, this.lower.c2, this.lower);
+    this.q4 = makeSegment(this.lower, this.lower.c1, this.inner.c2, this.inner);
   }
 
   see() {
@@ -131,25 +131,17 @@ class Eye {
 
     push();
     translate(width / 2 + this.cx, height / 2);
-    scale(0.5);
+    scale(0.8);
     noFill();
-    beginShape();
     strokeWeight(3);
-    // BezierVertex needs to be called four times
-    // for more: https://beta.p5js.org/reference/p5/beziervertex/ (v2)
-
-    // for each:
-    // 1. Anchor 1
-    // 2. Control 1
-    // 3. Control 2
-    // 4. Anchor 2
-    bezierVertex(this.inner.x, this.inner.y);
     for (let q of [this.q1, this.q2, this.q3, this.q4]) {
-      bezierVertex(q.c1.x, q.c1.y);
-      bezierVertex(q.c2.x, q.c2.y);
-      bezierVertex(q.a2.x, q.a2.y);
+      bezier(
+        q.a1.x, q.a1.y,
+        q.c1.x, q.c1.y,
+        q.c2.x, q.c2.y,
+        q.a2.x, q.a2.y,
+      );
     }
-    endShape();
     pop();
   }
 }
@@ -175,8 +167,9 @@ function makePoint(x, y, c1x, c1y, c2x, c2y) {
   return { x, y, c1: { x: c1x, y: c1y }, c2: { x: c2x, y: c2y } };
 }
 
-function makeSegment(c1, c2, a2) {
+function makeSegment(a1, c1, c2, a2) {
   return {
+    a1: { x: a1.x, y: a1.y },
     a2: { x: a2.x, y: a2.y },
     c1: c1,
     c2: c2,
