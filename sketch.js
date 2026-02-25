@@ -67,7 +67,8 @@ class Eye {
     this.cx = eyelidPeakX;
     this.side = side;
     this.strokeWeight = 7;
-    this.pupilSize = { w: eyeWidth * .9, h: eyeWidth * .6 }
+    this.pupilScale = .6;
+    this.pupilSize = { w: eyeWidth * .75, h: eyeWidth * .5 }
     this.color = 0;
 
     // define positions of points and their anchors, relative to eyelidPeakX
@@ -112,20 +113,37 @@ class Eye {
   }
 
   /**
-   * Moves the pupil towards where the hour hand would be pointing on an analogue clock.
-   * @param {number} t - the current time in a 12-hour clock, represented as a number between 0-4 where 0 is 12:00
+   * Finds the point on the pupil track (eyelid bezier) closest in direction to
+   * a target canvas coordinate, and draws the pupil there.
+   * @param {number} targetX - canvas x of the clock target (relative to canvas center)
+   * @param {number} targetY - canvas y of the clock target (relative to canvas center)
    */
-  lookAtHour(t) {
-    const clockwiseQuadrants = [this.q1, this.q4, this.q3, this.q2]
-    for (let q of clockwiseQuadrants) {
-      if (t < 1) {
-        let x = -this.side * bezierPoint(q.a1.x, q.c1.x, q.c2.x, q.a2.x, t);
-        let y = bezierPoint(q.a1.y, q.c1.y, q.c2.y, q.a2.y, t);
-        ellipse(x, y, this.pupilSize.w, this.pupilSize.h)
-        return
+  lookAt(targetX, targetY) {
+    // direction from this eye's center to the target, in eye-local coords
+    const dx = targetX - this.cx;
+    const dy = targetY;
+
+    const segments = [this.q1, this.q2, this.q3, this.q4];
+    const steps = 20;
+    let bestDot = -Infinity;
+    let bestX = 0, bestY = 0;
+
+    for (let q of segments) {
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const px = bezierPoint(q.a1.x, q.c1.x, q.c2.x, q.a2.x, t);
+        const py = bezierPoint(q.a1.y, q.c1.y, q.c2.y, q.a2.y, t);
+        // dot product of the pupil-track point direction vs target direction
+        const dot = px * dx + py * dy;
+        if (dot > bestDot) {
+          bestDot = dot;
+          bestX = px;
+          bestY = py;
+        }
       }
-      t--
     }
+
+    ellipse(bestX, bestY, this.pupilSize.w, this.pupilSize.h);
   }
 
   drawEyelids() {
@@ -153,13 +171,18 @@ class Eye {
   }
 
   drawPupil() {
+    // hour hand angle: 12 o'clock is straight up (-PI/2)
+    const hourAngle = map(lerpByHour(), 0, 4, -HALF_PI, HALF_PI * 3);
+    const clockRadius = min(width, height) * 0.4;
+    const targetX = cos(hourAngle) * clockRadius;
+    const targetY = sin(hourAngle) * clockRadius;
+
     push();
     translate(width / 2 + this.cx, height / 2);
-    scale(0.5);
+    scale(this.pupilScale);
     fill(this.color)
     noStroke()
-    const currentHour = lerpByHour();
-    this.lookAtHour(currentHour)
+    this.lookAt(targetX, targetY);
     pop();
   }
 
