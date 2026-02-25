@@ -163,6 +163,13 @@ function lerpInHour(min, max) {
   return map(3600 - secondsSinceHourStart, 0, 3600, min, max);
 }
 
+function lerpByHour() {
+  const now = new Date();
+  const secondsSinceDayStart = (now.getHours() % 12) * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const secondsIn12Hours = 12 * 3600;
+  return map(secondsSinceDayStart, 0, secondsIn12Hours, 0, 4);
+}
+
 function makePoint(x, y, c1x, c1y, c2x, c2y) {
   return { x, y, c1: { x: c1x, y: c1y }, c2: { x: c2x, y: c2y } };
 }
